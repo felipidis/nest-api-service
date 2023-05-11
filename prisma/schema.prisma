@@ -36,7 +36,7 @@ model Job {
   id          String       @id @default(uuid())
   description String
   price       Decimal      @db.Money
-  duration    DateTime     @db.Time()
+  duration    Int          @db.Integer()
   commission  Decimal      @db.Decimal(3, 2)
   Attendance  Attendance[]
 
@@ -46,8 +46,8 @@ model Job {
 model Attendance {
   id             String        @id @default(uuid())
   jobs           Job[]
-  Client         Client        @relation(fields: [clientId], references: [id])
-  Professional   Professional? @relation(fields: [professionalId], references: [id])
+  client         Client        @relation(fields: [clientId], references: [id])
+  professional   Professional? @relation(fields: [professionalId], references: [id])
   isFinished     Boolean       @default(false)
   clientId       String
   professionalId String?
