@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Professional, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ProfessionalService {
@@ -11,6 +12,13 @@ export class ProfessionalService {
   ): Promise<Professional | null> {
     return this.prisma.professional.findUnique({
       where: professionalWhereUniqueInput,
+      include: {
+        Services: {
+          include: {
+            jobs: true,
+          },
+        },
+      },
     });
   }
 
@@ -34,6 +42,8 @@ export class ProfessionalService {
   async createProfessional(
     data: Prisma.ProfessionalCreateInput,
   ): Promise<Professional> {
+    const hash = await bcrypt.hash(data.password, 12);
+    data.password = hash;
     return this.prisma.professional.create({
       data,
     });
