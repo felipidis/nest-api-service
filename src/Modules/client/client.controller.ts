@@ -6,9 +6,12 @@ import {
   Body,
   Put,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { Client as ClientModel } from '@prisma/client';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller()
 export class ClientController {
@@ -19,9 +22,10 @@ export class ClientController {
     return this.clientService.clients({});
   }
 
-  @Get('client/:id')
-  async getClientById(@Param('id') id: string): Promise<ClientModel> {
-    return this.clientService.client({ id });
+  @UseGuards(AuthGuard)
+  @Get('client/profile')
+  async getClientById(@Request() req): Promise<ClientModel> {
+    return this.clientService.client({ id: req.user.sub });
   }
 
   @Post('client')
