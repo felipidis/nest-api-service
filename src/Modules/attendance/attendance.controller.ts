@@ -6,9 +6,12 @@ import {
   Body,
   Put,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { Attendance as AttendanceModel } from '@prisma/client';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller()
 export class AttendanceController {
@@ -24,17 +27,18 @@ export class AttendanceController {
     return this.attendanceService.attendance({ id });
   }
 
+  @UseGuards(AuthGuard)
   @Post('attendance')
   async createAttendance(
     @Body()
     attendanceData: {
       jobIds: string[];
-      clientId: string;
     },
+    @Req() req,
   ): Promise<AttendanceModel> {
-    const { clientId, jobIds } = attendanceData;
+    const { jobIds } = attendanceData;
     return this.attendanceService.createAttendance({
-      client: { connect: { id: clientId } },
+      client: { connect: { id: req.user.sub } },
       jobs: {
         connect: jobIds.map((job) => ({
           id: job,
@@ -43,6 +47,7 @@ export class AttendanceController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Put('attendance/:id')
   async updateAttendance(
     @Param('id') id: string,
@@ -58,7 +63,7 @@ export class AttendanceController {
       data: {
         ...attendanceData,
         jobs: {
-          connect: attendanceData.jobs.map((job) => ({
+          connect: attendanceData.jobs?.map((job) => ({
             id: job,
           })),
         },

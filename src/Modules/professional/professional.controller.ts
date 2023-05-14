@@ -6,9 +6,12 @@ import {
   Body,
   Put,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProfessionalService } from './professional.service';
 import { Professional as ProfessionalModel } from '@prisma/client';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller()
 export class ProfessionalController {
@@ -19,11 +22,10 @@ export class ProfessionalController {
     return this.professionalService.professionals({});
   }
 
-  @Get('professional/:id')
-  async getProfessionalById(
-    @Param('id') id: string,
-  ): Promise<ProfessionalModel> {
-    return this.professionalService.professional({ id });
+  @UseGuards(AuthGuard)
+  @Get('professional/profile')
+  async getProfessionalById(@Request() req): Promise<ProfessionalModel> {
+    return this.professionalService.professional({ id: req.user.sub });
   }
 
   @Post('professional')

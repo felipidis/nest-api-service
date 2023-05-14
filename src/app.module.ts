@@ -4,6 +4,7 @@ import { AuthModule } from './Modules/auth/auth.module';
 import { ClientModule } from './Modules/client/client.module';
 import { JobModule } from './Modules/job/job.module';
 import { ProfessionalModule } from './Modules/professional/professional.module';
+import { PrismaModule } from 'nestjs-prisma';
 
 @Module({
   imports: [
@@ -12,6 +13,9 @@ import { ProfessionalModule } from './Modules/professional/professional.module';
     JobModule,
     AttendanceModule,
     AuthModule,
+    PrismaModule.forRoot({
+      isGlobal: true,
+    }),
   ],
 })
 export class AppModule {}
